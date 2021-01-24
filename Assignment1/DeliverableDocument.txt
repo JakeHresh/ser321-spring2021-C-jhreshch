@@ -1,0 +1,8 @@
+https://github.com/JakeHresh/ser321-spring2021-C-jhreshch.git
+
+The screenshots of the examples being run can be found as a PDF in the Assignment1 folder.
+
+Link to screencast:
+https://drive.google.com/file/d/1EbeV7GB4CodwYNA6_UaKByIKyYI7vizw/view?usp=sharing
+
+The second system is the AWS EC2 server.
