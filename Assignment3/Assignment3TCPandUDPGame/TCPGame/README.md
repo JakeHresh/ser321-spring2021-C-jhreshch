@@ -1,6 +1,6 @@
 ##### TCP Readme
 * This project represents a simple TCP socket program where a client answers questions sent over by a server. The client must attempt to answer the questions correctly within the timer, the duration of which is determined by the number of questions the client requested.
-##### TCP Readme
+##### Running the Program
 * Use gradle runServer to run the server. Optionally include -Pport=port where port represents a port number.
 * Use gradle runClient to run the client. Optionally include -Pport=port where port represents a port number and -Phost=hostIP where hostIP represents the IP address of the host.
 ##### Fulfilled Requirements
