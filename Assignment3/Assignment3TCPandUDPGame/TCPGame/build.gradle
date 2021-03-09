@@ -1,0 +1,74 @@
+apply plugin: 'java'
+
+description = "Client Server Socket Example"
+
+// Client and Server socket, socket can serve up to three clients
+// The port is defined directly in the Java files. For practice consider changing
+// the tasks to add the port as input to the Gradle task
+task runServer(type: JavaExec) {
+  group 'TCP Server/Client'
+  //description 'Creates Server socket waits for up to 3 messages'
+
+  classpath = sourceSets.main.runtimeClasspath
+
+  main = 'SockServer'
+  String port = "8080";
+  if(project.hasProperty("port")){
+    port = project.getProperty('port');
+  }
+  args(port);
+}
+
+task runClient(type: JavaExec) {
+  group 'TCP Server/Client'
+  //description 'Creates client socket sends a message and number to server'
+
+  classpath = sourceSets.main.runtimeClasspath
+  standardInput = System.in
+  main = 'SockClient'
+
+  String host = "localhost";
+  String message = "Successfully Connected With Server!";
+  String number = "1";
+  String port = "8080";
+  if (project.hasProperty("host")){
+    host = project.getProperty('host');
+  }
+  if (project.hasProperty("message")){
+    message = project.getProperty('message');
+  }
+  if (project.hasProperty("number")){
+    number = project.getProperty('number');
+  }
+  if (project.hasProperty("port")){
+    port = project.getProperty('port');
+  }
+  args(host, message, number, port);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
