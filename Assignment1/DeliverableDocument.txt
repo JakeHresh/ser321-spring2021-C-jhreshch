@@ -1,0 +1,10 @@
+https://github.com/JakeHresh/ser321-spring2021-C-jhreshch.git
+
+The list of 30 commands is found in the Assignment1 folder in Linux.pdf.
+
+The screenshots of the examples being run can be found as a PDF in the Assignment1 folder. The file is called pngtopdf.pdf.
+
+Link to screencast:
+https://drive.google.com/file/d/1EbeV7GB4CodwYNA6_UaKByIKyYI7vizw/view?usp=sharing
+
+The second system is the AWS EC2 server.
