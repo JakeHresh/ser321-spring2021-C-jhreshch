@@ -1,0 +1,117 @@
+apply plugin: 'application'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+   compile group: 'org.json', name: 'json', version: '20200518'//verions used to be 20200518
+}
+
+//define main class
+mainClassName = 'Concentration'
+
+task runTask1(type: JavaExec) {
+  group 'server'
+  description 'Creates Server socket waits for messages'
+
+  classpath = sourceSets.main.runtimeClasspath
+
+  main = 'taskone.Server'
+  standardInput = System.in
+  String port = "8080"
+  
+  // run with arguments e.g.: gradle runServer -Pport=9099 -q --console=plain
+  if (project.hasProperty('port')) {
+    port = project.getProperty('port');
+  }
+  args(port);
+}
+
+task runTask2(type: JavaExec) {
+  group 'server'
+  description 'Creates Threaded Server socket waits for messages'
+
+  classpath = sourceSets.main.runtimeClasspath
+
+  main = 'taskone.ThreadedServer'
+  standardInput = System.in
+  String port = "8080";
+  if (project.hasProperty('port')) {
+    port = project.getProperty('port');
+  }
+  args(port);
+}
+
+task runTask3(type: JavaExec) {
+  group 'client'
+  description 'Creates client socket sends a message to the server'
+
+  classpath = sourceSets.main.runtimeClasspath
+  standardInput = System.in
+
+  main = 'taskone.ThreadPoolServer'
+  standardInput = System.in
+  
+  // run with arguments e.g.: gradle runClient -Phost=localhost -Pport=9099 -q --console=plain
+  /*if (project.hasProperty("host") && project.hasProperty('port')) {
+    args(project.getProperty('host'), project.getProperty('port'));
+  }*/
+  String threads = "3";
+  String port = "8080";
+  if(project.hasProperty('threads'))
+  {
+    threads = project.getProperty('threads');
+  }
+  if(project.hasProperty('port'))
+  {
+    port = project.getProperty('port');
+  }
+  args(port);
+}
+
+task runClient(type: JavaExec) {
+  group 'client'
+  description 'Creates client socket sends a message to the server'
+
+  classpath = sourceSets.main.runtimeClasspath
+  standardInput = System.in
+
+  main = 'taskone.Client'
+  standardInput = System.in
+  
+  // run with arguments e.g.: gradle runClient -Phost=localhost -Pport=9099 -q --console=plain
+  /*if (project.hasProperty("host") && project.hasProperty('port')) {
+    args(project.getProperty('host'), project.getProperty('port'));
+  }*/
+  String host = "localhost";
+  String port = "8080";
+  if(project.hasProperty('host'))
+  {
+    host = project.getProperty('host');
+  }
+  if(project.hasProperty('port'))
+  {
+    port = project.getProperty('port');
+  }
+  args(host, port);
+}
+
+/*task runTask3(type: JavaExec) {
+  group 'server'
+  description 'Creates Threaded Pool Server socket waits for messages'
+
+  classpath = sourceSets.main.runtimeClasspath
+
+  main = 'taskone.ThreadPoolServer'
+  standardInput = System.in
+  String port = "8080";
+  String numThreads = "3";
+  if (project.hasProperty('port')) {
+    port = project.getProperty('port');
+  }
+  if(project.hasProperty('numThreads')) {
+    numThreads = project.getProperty('numThreads');
+  }
+  args(port, numThreads);
+}*/
