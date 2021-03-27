@@ -137,7 +137,7 @@ class SockBaseServer {
                     if(op.getOperationType() == Request.OperationType.NEW) // enter game
                     {
                         game.newGame(); // starting a new game
-                        while(true)
+                        while(game.getIdx() < game.getIdxMax())
                         {
                             Response response2;
                             //String qAndA[] = pickTask();
@@ -172,6 +172,17 @@ class SockBaseServer {
                             }
                             qAndA = pickTask();
                         }
+                        game.setWon();
+                        Response response = Response.newBuilder()
+                                    .setResponseType(Response.ResponseType.WON)
+                                    .setImage("YOU WON!")
+                                    .build();
+                        response.writeDelimitedTo(out);
+                        response = Response.newBuilder()
+                            .setResponseType(Response.ResponseType.GREETING)
+                            .setGreeting("Hello " + name + " and welcome. \nWhat would you like to do? \n 1 - to see the leader board \n 2 - to enter a game \n 3 - to quit")
+                            .build();
+                        response.writeDelimitedTo(out);
                     }
                     if(op.getOperationType() == Request.OperationType.QUIT) {
                         System.out.println("Client quitting");

@@ -82,6 +82,11 @@ class SockBaseClient {
                     while(true)
                     {
                         response = Response.parseDelimitedFrom(in);
+                        if(response.getImage().equals("YOU WON!"))
+                        {
+                            System.out.println("YOU WON!");
+                            break;
+                        }
                         if(response.getEval())
                         {
                             System.out.println("CORRECT");
@@ -95,6 +100,10 @@ class SockBaseClient {
                         op.writeDelimitedTo(out);
                     }
                     // when game ends, receive win response and break
+                    response = Response.parseDelimitedFrom(in);
+
+                    // print the server response. 
+                    System.out.println(response.getGreeting());
                 }
                 if(strToSend.equals("3"))
                 {

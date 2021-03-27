@@ -14,10 +14,6 @@ buffers/RequestProtos.java
  buffers.RequestProtos$RequestOrBuilder
 client/Player.java
  client.Player
-server/Game.java
- server.Game
-server/SockBaseServer.java
- server.SockBaseServer
 buffers/ResponseProtos.java
  buffers.ResponseProtos
  buffers.ResponseProtos$Entry
@@ -32,3 +28,7 @@ buffers/ResponseProtos.java
  buffers.ResponseProtos$ResponseOrBuilder
 client/SockBaseClient.java
  client.SockBaseClient
+server/Game.java
+ server.Game
+server/SockBaseServer.java
+ server.SockBaseServer
