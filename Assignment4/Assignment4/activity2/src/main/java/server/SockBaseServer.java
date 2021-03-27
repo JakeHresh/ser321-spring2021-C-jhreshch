@@ -33,7 +33,69 @@ class SockBaseServer {
             System.out.println("Error in constructor: " + e);
         }
     }
-
+    public String[] pickTask()
+    {
+        Random rand = new Random();
+        int taskSelection = rand.nextInt(10);
+        String task[] = new String[2];
+        if(taskSelection == 0)
+        {
+            task[0] = "Fill in the blank: Prince of ____ is the title of the videogame that appeared on Discovery Channel\'s How It\'s Made TV show.";
+            task[1] = "persia";
+            return task;
+        }
+        if(taskSelection == 1)
+        {
+            task[0] = "What is the last name of the whip-wielding warrior who wound up in the NES classic, Castlevania?";
+            task[1] = "belmont";
+            return task;
+        }
+        if(taskSelection == 2)
+        {
+            task[0] = "What is the last name of the famously overworked director of the Super Smash Bros. series?";
+            task[1] = "sakurai";
+            return task;
+        }
+        if(taskSelection == 3)
+        {
+            task[0] = "What is the last name of the attorney who defended Nintendo against Universal Studios over the copyright of Donkey Kong?";
+            task[1] = "kirby";
+            return task;
+        }
+        if(taskSelection == 4)
+        {
+            task[0] = "What is the Japanese name of the super fighting robot that battles Dr. Wily and his robot masters?";
+            task[1] = "rockman";
+            return task;
+        }
+        if(taskSelection == 5)
+        {
+            task[0] = "Fill in the blank: Stranded on an alien planet, Captain Olimar enlists the help of ____ to recover his missing ship parts within 30 days.";
+            task[1] = "pikmin";
+            return task;
+        }
+        if(taskSelection == 6)
+        {
+            task[0] = "What villain of the Super Mario Bros. series shares a name with the current president of Nintendo of America?";
+            task[1] = "bowser";
+            return task;
+        }
+        if(taskSelection == 7)
+        {
+            task[0] = "Finish this slogan: Genesis does what ____.";
+            task[1] = "nintendon\'t";
+            return task;
+        }
+        if(taskSelection == 8)
+        {
+            task[0] = "What is the American name of the cult-classic RPG Mother 2?";
+            task[1] = "earthbound";
+            return task;
+        }
+        task[0] = "While Super Mario has had many jobs, what professional occupation is he known for?";
+        task[1] = "plumber";
+        return task;
+    }
     // Handles the communication right now it just accepts one input and then is done you should make sure the server stays open
     // can handle multiple requests and does not crash when the server crashes
     // you can use this server as based or start a new one if you prefer. 
@@ -65,7 +127,52 @@ class SockBaseServer {
                 }
                 while(true)
                 {
+                    boolean answeredCorrectly = false;
+                    String qAndA[] = pickTask();
                     op = Request.parseDelimitedFrom(in);
+                    if(op.getOperationType() == Request.OperationType.LEADER) // view leaderboard
+                    {
+
+                    }
+                    if(op.getOperationType() == Request.OperationType.NEW) // enter game
+                    {
+                        game.newGame(); // starting a new game
+                        while(true)
+                        {
+                            Response response2;
+                            //String qAndA[] = pickTask();
+                            // adding the String of the game to 
+                            if(answeredCorrectly)
+                            {
+                                response2 = Response.newBuilder()
+                                    .setResponseType(Response.ResponseType.TASK)
+                                    .setImage(game.replaceOneCharacter())
+                                    .setTask(qAndA[0])
+                                    .setEval(true)
+                                    .build();
+                                answeredCorrectly = false;
+                            }
+                            else
+                            {
+                                response2 = Response.newBuilder()
+                                    .setResponseType(Response.ResponseType.TASK)
+                                    .setImage(game.getImage())
+                                    .setTask(qAndA[0])
+                                    .setEval(false)
+                                    .build();
+                            }
+                            
+                            response2.writeDelimitedTo(out);
+                            op = Request.parseDelimitedFrom(in);
+                            String answer = op.getAnswer().toLowerCase();
+                            System.out.println(answer);
+                            if(answer.equals(qAndA[1]))
+                            {
+                                answeredCorrectly = true;
+                            }
+                            qAndA = pickTask();
+                        }
+                    }
                     if(op.getOperationType() == Request.OperationType.QUIT) {
                         System.out.println("Client quitting");
                         Response response = Response.newBuilder()

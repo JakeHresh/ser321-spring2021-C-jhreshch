@@ -75,10 +75,24 @@ class SockBaseClient {
                 if(strToSend.equals("2"))
                 {
                     // send request to start game
+                    op = Request.newBuilder()
+                            .setOperationType(Request.OperationType.NEW).build();
+                    op.writeDelimitedTo(out);
                     // initiate loop with its own set of requests and responses
                     while(true)
                     {
-
+                        response = Response.parseDelimitedFrom(in);
+                        if(response.getEval())
+                        {
+                            System.out.println("CORRECT");
+                        }
+                        System.out.println(response.getImage());
+                        System.out.println(response.getTask());
+                        strToSend = stdin.readLine();
+                        op = Request.newBuilder()
+                            .setOperationType(Request.OperationType.ANSWER)
+                            .setAnswer(strToSend).build();
+                        op.writeDelimitedTo(out);
                     }
                     // when game ends, receive win response and break
                 }

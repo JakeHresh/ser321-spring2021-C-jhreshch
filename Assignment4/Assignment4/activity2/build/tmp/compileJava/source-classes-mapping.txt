@@ -16,8 +16,8 @@ client/Player.java
  client.Player
 server/Game.java
  server.Game
-client/SockBaseClient.java
- client.SockBaseClient
+server/SockBaseServer.java
+ server.SockBaseServer
 buffers/ResponseProtos.java
  buffers.ResponseProtos
  buffers.ResponseProtos$Entry
@@ -30,5 +30,5 @@ buffers/ResponseProtos.java
  buffers.ResponseProtos$Response$ResponseType
  buffers.ResponseProtos$Response$ResponseType$1
  buffers.ResponseProtos$ResponseOrBuilder
-server/SockBaseServer.java
- server.SockBaseServer
+client/SockBaseClient.java
+ client.SockBaseClient
