@@ -47,7 +47,7 @@ class SockBaseClient {
         try {
             // connect to the server
             serverSock = new Socket(host, port);
-
+            String serverState = "going";
             // write to the server
             out = serverSock.getOutputStream();
             in = serverSock.getInputStream();
@@ -59,6 +59,42 @@ class SockBaseClient {
 
             // print the server response. 
             System.out.println(response.getGreeting());
+            while(true)
+            {
+                strToSend = stdin.readLine();
+                while(!strToSend.equals("1") && !strToSend.equals("2") && !strToSend.equals("3"))
+                {
+                    strToSend = stdin.readLine();
+                }
+                if(strToSend.equals("1"))
+                {
+                    // send request to view leaderboard
+                    // receive response with leaderboard
+                    // receive response with greeting
+                }
+                if(strToSend.equals("2"))
+                {
+                    // send request to start game
+                    // initiate loop with its own set of requests and responses
+                    while(true)
+                    {
+
+                    }
+                    // when game ends, receive win response and break
+                }
+                if(strToSend.equals("3"))
+                {
+                    // send request to end game
+                    op = Request.newBuilder()
+                            .setOperationType(Request.OperationType.QUIT).build();
+                    op.writeDelimitedTo(out);
+                    // receive bye response
+                    response = Response.parseDelimitedFrom(in);
+                    System.out.println(response.getMessage());
+                    // close client
+                    break;
+                }
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

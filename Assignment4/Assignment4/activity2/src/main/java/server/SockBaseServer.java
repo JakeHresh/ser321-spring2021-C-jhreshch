@@ -43,78 +43,91 @@ class SockBaseServer {
 
         System.out.println("Ready...");
         try {
-            // read the proto object and put into new objct
-            Request op = Request.parseDelimitedFrom(in);
-            String result = null;
+                // read the proto object and put into new objct
+                Request op = Request.parseDelimitedFrom(in);
+                String result = null;
 
             
 
-            // if the operation is NAME (so the beginning then say there is a commention and greet the client)
-            if (op.getOperationType() == Request.OperationType.NAME) {
-                // get name from proto object
-            name = op.getName();
+                // if the operation is NAME (so the beginning then say there is a commention and greet the client)
+                if (op.getOperationType() == Request.OperationType.NAME) {
+                    // get name from proto object
+                    name = op.getName();
 
-            // writing a connect message to the log with name and CONNENCT
-            writeToLog(name, Message.CONNECT);
-                System.out.println("Got a connection and a name: " + name);
-                Response response = Response.newBuilder()
-                        .setResponseType(Response.ResponseType.GREETING)
-                        .setGreeting("Hello " + name + " and welcome. \nWhat would you like to do? \n 1 - to see the leader board \n 2 - to enter a game")
-                        .build();
-                response.writeDelimitedTo(out);
+                    // writing a connect message to the log with name and CONNENCT
+                    writeToLog(name, Message.CONNECT);
+                    System.out.println("Got a connection and a name: " + name);
+                    Response response = Response.newBuilder()
+                            .setResponseType(Response.ResponseType.GREETING)
+                            .setGreeting("Hello " + name + " and welcome. \nWhat would you like to do? \n 1 - to see the leader board \n 2 - to enter a game \n 3 - to quit")
+                            .build();
+                    response.writeDelimitedTo(out);
+                }
+                while(true)
+                {
+                    op = Request.parseDelimitedFrom(in);
+                    if(op.getOperationType() == Request.OperationType.QUIT) {
+                        System.out.println("Client quitting");
+                        Response response = Response.newBuilder()
+                            .setResponseType(Response.ResponseType.BYE)
+                            .setMessage("Thanks for playing! See you next time!")
+                            .build();
+                        response.writeDelimitedTo(out);
+                        break;
+                    }
+                }
+                /*
+                // Example how to start a new game and how to build a response with the image which you could then send to the server
+                // LINE 67-108 are just an example for Protobuf and how to work with the differnt types. They DO NOT
+                // belong into this code. 
+                game.newGame(); // starting a new game
+
+                // adding the String of the game to 
+                Response response2 = Response.newBuilder()
+                    .setResponseType(Response.ResponseType.TASK)
+                    .setImage(game.getImage())
+                    .setTask("Great task goes here")
+                    .build();
+
+                // On the client side you would receive a Response object which is the same as the one in line 70, so now you could read the fields
+                System.out.println("Task: " + response2.getResponseType());
+                System.out.println("Image: \n" + response2.getImage());
+                System.out.println("Task: \n" + response2.getTask());
+
+                // Creating Entry and Leader response
+                Response.Builder res = Response.newBuilder()
+                    .setResponseType(Response.ResponseType.LEADER);
+
+                // building and Entry
+                Entry leader = Entry.newBuilder()
+                    .setName("name")
+                    .setWins(0)
+                    .setLogins(0)
+                    .build();
+
+                // building and Entry
+                Entry leader2 = Entry.newBuilder()
+                    .setName("name2")
+                    .setWins(1)
+                    .setLogins(1)
+                    .build();
+
+                res.addLeader(leader);
+                res.addLeader(leader2);
+
+                Response response3 = res.build();
+
+                for (Entry lead: response3.getLeaderList()){
+                    System.out.println(lead.getName() + ": " + lead.getWins());
+                }*/
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                if (out != null)  out.close();
+                if (in != null)   in.close();
+                if (clientSocket != null) clientSocket.close();
             }
-
-            // Example how to start a new game and how to build a response with the image which you could then send to the server
-            // LINE 67-108 are just an example for Protobuf and how to work with the differnt types. They DO NOT
-            // belong into this code. 
-            game.newGame(); // starting a new game
-
-            // adding the String of the game to 
-            Response response2 = Response.newBuilder()
-                .setResponseType(Response.ResponseType.TASK)
-                .setImage(game.getImage())
-                .setTask("Great task goes here")
-                .build();
-
-            // On the client side you would receive a Response object which is the same as the one in line 70, so now you could read the fields
-            System.out.println("Task: " + response2.getResponseType());
-            System.out.println("Image: \n" + response2.getImage());
-            System.out.println("Task: \n" + response2.getTask());
-
-            // Creating Entry and Leader response
-            Response.Builder res = Response.newBuilder()
-                .setResponseType(Response.ResponseType.LEADER);
-
-            // building and Entry
-            Entry leader = Entry.newBuilder()
-                .setName("name")
-                .setWins(0)
-                .setLogins(0)
-                .build();
-
-            // building and Entry
-            Entry leader2 = Entry.newBuilder()
-                .setName("name2")
-                .setWins(1)
-                .setLogins(1)
-                .build();
-
-            res.addLeader(leader);
-            res.addLeader(leader2);
-
-            Response response3 = res.build();
-
-            for (Entry lead: response3.getLeaderList()){
-                System.out.println(lead.getName() + ": " + lead.getWins());
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            if (out != null)  out.close();
-            if (in != null)   in.close();
-            if (clientSocket != null) clientSocket.close();
-        }
     }
 
     /**
