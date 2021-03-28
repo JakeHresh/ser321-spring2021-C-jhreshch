@@ -61,7 +61,8 @@ class SockBaseClient {
             System.out.println(response.getGreeting());
             while(true)
             {
-                strToSend = stdin.readLine();
+                try{
+                    strToSend = stdin.readLine();
                 while(!strToSend.equals("1") && !strToSend.equals("2") && !strToSend.equals("3"))
                 {
                     strToSend = stdin.readLine();
@@ -117,6 +118,12 @@ class SockBaseClient {
                     // close client
                     break;
                 }
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
+                
             }
 
         } catch (Exception e) {

@@ -102,7 +102,7 @@ class SockBaseServer {
     public void start() throws IOException {
         String name = "";
 
-
+        int correctBonus = 0;
         System.out.println("Ready...");
         try {
                 // read the proto object and put into new objct
@@ -139,14 +139,29 @@ class SockBaseServer {
                         game.newGame(); // starting a new game
                         while(game.getIdx() < game.getIdxMax())
                         {
+                            System.out.println("Answer " + qAndA[1]);
                             Response response2;
                             //String qAndA[] = pickTask();
                             // adding the String of the game to 
                             if(answeredCorrectly)
                             {
+                                correctBonus++;
+                                int tilesRemoved = 0;
+                                if(game.getIdx()  + correctBonus >= game.getIdxMax())
+                                {
+                                    tilesRemoved = (game.getIdx() + correctBonus) - game.getIdxMax();
+                                }
+                                else
+                                {
+                                    tilesRemoved = correctBonus;
+                                }
+                                for(int i = 0; i < tilesRemoved && game.getIdx() < game.getIdxMax(); i++)
+                                {
+                                    game.replaceOneCharacter();
+                                }
                                 response2 = Response.newBuilder()
                                     .setResponseType(Response.ResponseType.TASK)
-                                    .setImage(game.replaceOneCharacter())
+                                    .setImage(game.getImage())
                                     .setTask(qAndA[0])
                                     .setEval(true)
                                     .build();
@@ -154,6 +169,7 @@ class SockBaseServer {
                             }
                             else
                             {
+                                correctBonus = 0;
                                 response2 = Response.newBuilder()
                                     .setResponseType(Response.ResponseType.TASK)
                                     .setImage(game.getImage())
@@ -341,11 +357,16 @@ class SockBaseServer {
             e.printStackTrace();
             System.exit(2);
         }
-
-        clientSocket = serv.accept();
-        SockBaseServer server = new SockBaseServer(clientSocket, game);
-        server.start();
-
+        try {
+            clientSocket = serv.accept();
+            SockBaseServer server = new SockBaseServer(clientSocket, game);
+            server.start();
+        }
+        catch(Exception e) {
+            clientSocket = serv.accept();
+            SockBaseServer server = new SockBaseServer(clientSocket, game);
+            server.start();
+        }
     }
 }
 
