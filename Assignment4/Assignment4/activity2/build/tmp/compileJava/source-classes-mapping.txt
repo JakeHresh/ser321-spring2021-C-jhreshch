@@ -26,9 +26,9 @@ buffers/ResponseProtos.java
  buffers.ResponseProtos$Response$ResponseType
  buffers.ResponseProtos$Response$ResponseType$1
  buffers.ResponseProtos$ResponseOrBuilder
-client/SockBaseClient.java
- client.SockBaseClient
 server/Game.java
  server.Game
+client/SockBaseClient.java
+ client.SockBaseClient
 server/SockBaseServer.java
  server.SockBaseServer

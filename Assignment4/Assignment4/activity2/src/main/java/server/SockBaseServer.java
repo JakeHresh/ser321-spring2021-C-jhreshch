@@ -101,7 +101,7 @@ class SockBaseServer {
     // you can use this server as based or start a new one if you prefer. 
     public void start() throws IOException {
         String name = "";
-
+        int wins = 0;
         int correctBonus = 0;
         System.out.println("Ready...");
         try {
@@ -132,7 +132,16 @@ class SockBaseServer {
                     op = Request.parseDelimitedFrom(in);
                     if(op.getOperationType() == Request.OperationType.LEADER) // view leaderboard
                     {
-
+                        Response response = Response.newBuilder()
+                            .setResponseType(Response.ResponseType.LEADER)
+                            .setMessage("Number of wins: " + wins)
+                            .build();
+                        response.writeDelimitedTo(out);
+                            response = Response.newBuilder()
+                            .setResponseType(Response.ResponseType.GREETING)
+                            .setGreeting("Hello " + name + " and welcome. \nWhat would you like to do? \n 1 - to see the leader board \n 2 - to enter a game \n 3 - to quit")
+                            .build();
+                        response.writeDelimitedTo(out);
                     }
                     if(op.getOperationType() == Request.OperationType.NEW) // enter game
                     {

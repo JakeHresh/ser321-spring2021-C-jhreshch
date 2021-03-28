@@ -70,8 +70,18 @@ class SockBaseClient {
                 if(strToSend.equals("1"))
                 {
                     // send request to view leaderboard
+                    op = Request.newBuilder()
+                            .setOperationType(Request.OperationType.LEADER).build();
+                    op.writeDelimitedTo(out);
                     // receive response with leaderboard
+                    response = Response.parseDelimitedFrom(in);
+                    System.out.println(response.getMessage());
                     // receive response with greeting
+                    // read from the server
+                    response = Response.parseDelimitedFrom(in);
+
+                    // print the server response. 
+                     System.out.println(response.getGreeting());
                 }
                 if(strToSend.equals("2"))
                 {
