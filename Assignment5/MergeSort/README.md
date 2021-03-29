@@ -206,3 +206,5 @@ system. Any benefit in saving memory resources by splitting up the data for dist
 systems is eclipsed by the performance hits that result in such splitting, especially when these
 distributed systems reside on remote AWS instances. Therefore, this algorithm would fare better as
 either a parallel or even a sequential algorithm.
+
+Link to video demonstrating running with remote Sorters: https://drive.google.com/file/d/1I7ZGX9kUzUwgnHGNtG2kdJn0WS8kbx0-/view?usp=sharing
