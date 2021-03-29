@@ -162,10 +162,47 @@ Task 2
 
 1.
 
+Before running the AWS Sorters, I do expect to find changes in runtimes since there should
+be additional latency in the communication between the local Branch and the remote server.
+
 2.
+
+As with the previous experiments, I decided to run 10 tests for each array. These tests
+will use the setup that has a local Branch and two remote Sorters.
+
+(Times are in milliseconds)
+
+|||
+|---|---|
+|ARRAY 1 Average Time: |7904|
+|ARRAY 2 Average Time: |2550.2|
+|ARRAY 3 Average Time: |5886|
+|ARRAY 4 Average Time: |5839.3|
+
+These times are much longer than the times on the localhost. This is most likely the result
+of the expected latency as packets are sent over the wire to a remote server. When examining 
+the TCP traffic, there are occasionally Keep-alive packets, indicating that some packets are
+not successfully sent over the wire and that the packets must again be sent. Issues like this
+only further compound the amount of time spent sending packets over the wire through Branches.
 
 Task 3
 
 1.
 
+Most time is lost when data is sent to remote Sorter instances like those on the AWS instance.
+There is little that can be done to greatly improve the efficiency if data must be sent to
+such Sorters. Structural changes like reducing the number of Sorters to 1 can reduce the
+communication needed to support sorting, which can also reduce time spent. Additionally,
+algorithmic changes like sending the entire sorted array over the wire as a JSON array
+instead of sending single elements one-by-one over the wire can greatly reduce communication
+time, thereby improving efficiency. However, as stated earlier, connection issues with the AWS
+instance and other issues in communicating with remote distributed systems are difficult to 
+address when attempting to improve efficiency.
+
 2.
+
+Given the above findings, it doesn't make much sense to run this algorithm as a distributed
+system. Any benefit in saving memory resources by splitting up the data for distributed
+systems is eclipsed by the performance hits that result in such splitting, especially when these
+distributed systems reside on remote AWS instances. Therefore, this algorithm would fare better as
+either a parallel or even a sequential algorithm.
