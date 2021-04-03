@@ -21,9 +21,18 @@ task Starter(type: JavaExec) {
 
   main = 'mergeSort.MergeSort'
   standardInput = System.in
-
-  args 7000
-  args "localhost"
+  String port = "7000";
+  String host = "localhost";
+  //args 7000
+  //args "localhost"
+  if(project.hasProperty("port")){
+    port = project.getProperty('port');
+  }
+  if(project.hasProperty("host")){
+    host = project.getProperty('host');
+  }
+  args port
+  args host
 }
 
 task Branch(type: JavaExec) {
@@ -37,6 +46,8 @@ task Branch(type: JavaExec) {
   String port1 = "7000";
   String port2 = "8000";
   String port3 = "8001";
+  String leftHost = "localhost";
+  String rightHost = "localhost"
   //args 7000
   //args 8000
   //args 8001
@@ -49,9 +60,17 @@ task Branch(type: JavaExec) {
   if(project.hasProperty("port3")){
     port3 = project.getProperty('port3');
   }
+  if(project.hasProperty("leftHost")){
+    leftHost = project.getProperty('leftHost');
+  }
+  if(project.hasProperty("rightHost")){
+    rightHost = project.getProperty('rightHost');
+  }
   args port1
   args port2
   args port3
+  args leftHost
+  args rightHost
 }
 
 task Sorter(type: JavaExec) {
