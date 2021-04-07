@@ -42,13 +42,82 @@ public class ServerTask extends Thread {
 
 			    	System.out.println("     " + json.getString("username") + " wants to join the network");
 			    	peer.updateListenToPeers(json.getString("ip") + ":" + json.getInt("port"));
-			    	out.println(("{'type': 'join', 'list': '"+ peer.getPeers() +"'}"));
-
+			    	out.println(("{'type': 'join', 'list': '"+ peer.getPeers() +"', 'jokes': '" + peer.getFinalJokes() + "'}"));
+			    	//String finaljokes = peer.getFinalJokes();
+			    	//System.out.println(finaljokes);
 			    	if (peer.isLeader()){
 			    		peer.pushMessage(json.toString());
 			    	}
+
+			    	//peer.clearFinalJokes();
+			    	//peer.updateFinalJokeList(finaljokes);
+
+			    	//This section needs a way to create a string concatenation of jokes, send that to the joining peer, and
+			    	//have the peer parse it out to update its own joke list.
+
 			    	// TODO: should make sure that all peers that the leader knows about also get the info about the new peer joining
 			    	// so they can add that peer to the list
+			    } else if(json.getString("type").equals("joke")){
+			    	/*peer.updateJokeList(json.getString("message"));
+			    	out.println(("{'type': 'joke', 'list': '"+ peer.getJokes() +"'}"));
+			    	if (peer.isLeader()){
+			    		peer.pushMessage(json.toString());
+			    	}*/
+			    	if (peer.isLeader()){
+			    		peer.setConsentNeeded(peer.getPeersSize());
+			    		peer.addJoke(json.getString("message"));
+			    		peer.pushMessage("{'type': 'tellothersjoke', 'username': '"+ json.getString("username") +"','message':'" + json.getString("message") + "'}");
+			    	}
+			    } else if(json.getString("type").equals("tellothersjoke")){
+			    	if(!peer.isLeader()){
+			    		peer.addJoke(json.getString("message"));
+			    	}
+			    } else if(json.getString("type").equals("consent")){
+			    	if(peer.isLeader()){
+			    		peer.addConsent();
+			    		if(peer.getConsent() == peer.getPeersSize() && peer.getPeersSize() == peer.getConsentNeeded()){
+			    			peer.resetConsent();
+			    			peer.resetConsentNeeded();
+			    			peer.addFinalJoke(json.getString("message"));
+			    			System.out.println("pushing final joke");
+			    			peer.pushMessage("{'type': 'finaljoke', 'username': '"+ json.getString("username") +"','message':'" + json.getString("message") + "'}");//push message to send joke to final joke list and empty potential joke list
+			    			peer.clearJokes();
+			    		}
+			    		else if(peer.getPeersSize() != peer.getConsentNeeded())
+			    		{
+			    			peer.pushMessage("{'type': 'consensusfail', 'username': '"+ json.getString("username") +"','message':'The number of peers has changed. Consensus cannot be reached.'}");
+			    			peer.resetConsent();
+			    			peer.resetConsentNeeded();
+			    			peer.clearJokes();
+			    		}
+			    		else
+			    		{
+			    			System.out.println("Consensus not yet reached.");
+			    		}
+			    	}
+			    } else if(json.getString("type").equals("tellemwhosboss")){
+			    	//System.out.println("     " + json); // just to show the json
+
+			    	//System.out.println("     " + json.getString("username") + " wants to join the network");
+			    	peer.updateListenToPeers(json.getString("ip") + ":" + json.getInt("port"));
+			    	//out.println(("{'type': 'join', 'list': '"+ peer.getPeers() +"'}"));
+			    	SocketInfo sn = new SocketInfo(json.getString("ip"), json.getInt("port"));
+			    	peer.setLeader(true, sn);
+			    	peer.setDetectedMissingLeader(true);
+			    	//if (peer.isLeader()){
+			    	//	peer.pushMessage(json.toString());
+			    		//peer.setDetectedMissingLeader(false);
+			    	//}
+			    } else if(json.getString("type").equals("consensusfail'")){
+			    	peer.resetConsent();
+			    	peer.resetConsentNeeded();
+			    	peer.clearJokes();
+			    	System.out.println(json.getString("message"));
+			    } else if(json.getString("type").equals("finaljoke")){
+			    	peer.addFinalJoke(json.getString("message"));
+			    	peer.resetConsent();
+			    	peer.resetConsentNeeded();
+			    	peer.clearJokes();
 			    } else {
 			    	System.out.println("[" + json.getString("username")+"]: " + json.getString("message")/*.replaceAll("*", "'")*/);
 			    }

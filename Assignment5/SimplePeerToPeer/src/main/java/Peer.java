@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.io.PrintWriter;
 import org.json.*;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 /**
  * This is the main class for the peer2peer program.
@@ -24,9 +25,16 @@ public class Peer {
 	private ServerThread serverThread;
 
 	private Set<SocketInfo> peers = new HashSet<SocketInfo>();
+	private ArrayList<String> jokes = new ArrayList<String>();
+	private ArrayList<String> finalJokes = new ArrayList<String>();
 	private boolean leader = false;
 	private SocketInfo leaderSocket;
-
+	private int consentNum = 0;
+	private int consentNeeded = -1;
+	private boolean detectedMissingLeader = false;
+	private boolean informed = false;
+	private static String hostInfo = "";
+	private static String portInfo = "";
 	
 	public Peer(BufferedReader bufReader, String username,ServerThread serverThread){
 		this.username = username;
@@ -56,6 +64,79 @@ public class Peer {
 		return s; 
 	}
 
+	public boolean checkDuplicatePeer(String ipStr, int portStr){
+		for (SocketInfo p: peers){//s.getHost(), s.getPort()
+			if(p.getHost().equals(ipStr) && p.getPort() == portStr)
+			{
+				//System.out.println("Duplicate entry exists. Wait until timeout to accept peer.");
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public int getPeersSize(){
+		return peers.size();
+	}
+
+	public synchronized void addJoke(String j){
+		jokes.add(j);
+		grantConsent("{'type': 'consent', 'username': '"+ username +"','message':'" + j + "'}");//send a message indicating consent
+	}
+
+	public String getJokes(){
+		String s = "";
+		for(String j: jokes){
+			s = s + j + "`"; 
+		}
+		return s;
+	}
+	public void clearJokes(){
+		jokes.clear();
+	}
+	public void clearFinalJokes(){
+		finalJokes.clear();
+	}
+	public void addFinalJoke(String j){
+		finalJokes.add(j);
+	}
+	public String getFinalJokes(){
+		String s = "";
+		for(String j: finalJokes){
+			s = s + j + "`";
+		}
+		return s;
+	}
+	public synchronized void addConsent(){
+		consentNum++;
+	}
+	public synchronized int getConsent(){
+		return consentNum;// use this to compare to the current number of nodes in the list. If it's equal to the size of the socket info list, consent is granted and the joke is added.
+	}
+	public synchronized void resetConsent(){
+		consentNum = 0;
+	}
+	public synchronized void setConsentNeeded(int c){
+		consentNeeded = c;
+	}
+	public synchronized void resetConsentNeeded(){
+		consentNeeded = -1;
+	}
+	public synchronized int getConsentNeeded(){
+		return consentNeeded;
+	}
+	public synchronized boolean getDetectedMissingLeader(){
+		return detectedMissingLeader;
+	}
+	public synchronized void setDetectedMissingLeader(boolean b){
+		detectedMissingLeader = b;
+	}
+	public synchronized boolean getInformed(){
+		return informed;
+	}
+	public synchronized void setInformed(boolean b){
+		informed = b;
+	}
 	/**
 	 * Adds all the peers in the list to the peers list
 	 * Only adds it if it is not the currect peer (self)
@@ -72,7 +153,21 @@ public class Peer {
 				continue;
 			}
 			SocketInfo s = new SocketInfo(hostPort[0], Integer.valueOf(hostPort[1]));
-			peers.add(s);
+			if(!checkDuplicatePeer(hostPort[0], Integer.valueOf(hostPort[1])))
+				peers.add(s);
+		}
+	}
+
+	public synchronized void updateJokeList(String list) throws Exception {
+		String[] jokeList = list.split("*");
+		for(String j: jokeList){
+			jokes.add(j); 
+		}
+	}
+	public synchronized void updateFinalJokeList(String list) throws Exception{
+		String[] finalJokeList = list.split("`");
+		for(String j: finalJokeList){
+			finalJokes.add(j);
 		}
 	}
 	
@@ -101,9 +196,41 @@ public class Peer {
 				//String message = bufferedReader.readLine();
 				Scanner scan = new Scanner(System.in);
 				String message = scan.nextLine();
+				if(message.equals("joke"))
+				{
+					if(isLeader())
+					{
+						System.out.println("The leader does not enter jokes. The leader only processes the jokes of peers.");
+						continue;
+					}
+					System.out.println("Please enter your joke");
+					String joke = scan.nextLine();
+					joke = joke.replaceAll("'", "’");
+					jokes.add(joke);
+					//addJoke(joke);
+					pushMessage("{'type': 'joke', 'username': '"+ username +"','message':'" + joke + "'}");
+					continue;
+				}
+				if(message.equals("display jokes"))
+				{
+					//System.out.println(jokes.getJokes());
+					for(String j: jokes)
+					{
+						System.out.println(j);
+					}
+					continue;
+				}
+				if(message.equals("display final jokes"))
+				{
+					for(String j: finalJokes)
+					{
+						System.out.println(j);
+					}
+					continue;
+				}
 				message = message.replaceAll("'", "’");
 				//System.out.println(message);
-				if (message.equals("exit")) {
+				if (message.equals("exit") && !message.equals("joke")) {
 					System.out.println("bye, see you next time");
 					break;
 				} else {
@@ -143,14 +270,58 @@ public class Peer {
 					}
 					return; // returning since we cannot connect or something goes wrong the rest will not work. 
 				}
-
+				/*Thread pulseThread = new Thread(() -> { // This extra pulse thread helps detect unavailable nodes.
+					try{
+						Thread.sleep(6000);
+						System.out.println("Could not connect to leader since peer with your host and port already exits. Try again later.");
+						System.exit(0);
+					}
+					catch(Exception e) {
+						e.printStackTrace();
+					}
+				});
+				pulseThread.start();*/
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 				out.println(message);
+				//pulseThread.stop();
 
 				JSONObject json = new JSONObject(reader.readLine());
 				System.out.println("     Received from server " + json);
 				String list = json.getString("list");
 				updateListenToPeers(list); // when we get a list of all other peers that the leader knows we update them
+				String finaljokes = json.getString("jokes");
+				updateFinalJokeList(finaljokes);
+
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void grantConsent(String message){
+		try {
+			System.out.println("pushing final joke");
+			BufferedReader reader = null; 
+				Socket socket = null;
+				try {
+					socket = new Socket(leaderSocket.getHost(), leaderSocket.getPort());
+					reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					
+				} catch (Exception c) {
+					if (socket != null) {
+						socket.close();
+					} else {
+						//System.out.println("Could not connect to " + leaderSocket.getHost() + ":" + leaderSocket.getPort());
+					}
+					return; // returning since we cannot connect or something goes wrong the rest will not work. 
+				}
+
+				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				out.println(message);
+
+				//JSONObject json = new JSONObject(reader.readLine());
+				//System.out.println("     Received from server " + json);
+				//String list = json.getString("list");
+				//updateListenToPeers(list); // when we get a list of all other peers that the leader knows we update them
 
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -179,7 +350,18 @@ public class Peer {
 					if (socket != null) {
 						socket.close();
 					} else {
-						
+
+						if(s == leaderSocket && !detectedMissingLeader)
+						{
+							//do needed stuff to become leader
+							SocketInfo sn = new SocketInfo(hostInfo, Integer.valueOf(portInfo));
+							setLeader(true, sn);
+							//tell other peers who is the new leader
+							//setDetectedMissingLeader(true);
+							//push message containing socket and port info.
+							pushMessage("{'type': 'tellemwhosboss', 'username': '"+ username +"','ip':'" + hostInfo + "','port':'" + portInfo + "'}");
+							//once message is received, they will execute a commLeader command with the sent info
+						}
 						System.out.println("  Could not connect to " + s.getHost() + ":" + s.getPort());
 						System.out.println("  Removing that socketInfo from list");
 						toRemove.add(s);
@@ -190,6 +372,16 @@ public class Peer {
 
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 				out.println(message);
+				//Test section to update peer joke lists
+				/*if(message.contains("{'type': 'joke',")){
+					JSONObject json = new JSONObject(reader.readLine());
+					if(json.getString("type").equals("joke")){
+						System.out.println("     Received from server " + json);
+						String list = json.getString("list");
+						updateJokeList(list);
+					}
+				}*/
+
 				counter++;
 				socket.close();
 		     }
@@ -231,6 +423,10 @@ public class Peer {
 
         String[] hostPort = args[2].split(":");
         SocketInfo s = new SocketInfo(hostPort[0], Integer.valueOf(hostPort[1]));
+        String h = new String(hostPort[0]);
+        String p = new String(hostPort[1]);
+        hostInfo = h;
+        portInfo = p;
         System.out.println(args[3]);
         if (args[3].equals("true")){
 			System.out.println("Is leader");
