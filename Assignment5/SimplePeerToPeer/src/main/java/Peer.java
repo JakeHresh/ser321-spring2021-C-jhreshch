@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import org.json.*;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.lang.*;
 
 /**
  * This is the main class for the peer2peer program.
@@ -35,6 +36,7 @@ public class Peer {
 	private boolean informed = false;
 	private static String hostInfo = "";
 	private static String portInfo = "";
+	private int leaderCount = 0;
 	
 	public Peer(BufferedReader bufReader, String username,ServerThread serverThread){
 		this.username = username;
@@ -45,6 +47,10 @@ public class Peer {
 	public void setLeader(boolean leader, SocketInfo leaderSocket){
 		this.leader = leader;
 		this.leaderSocket = leaderSocket;
+	}
+
+	public SocketInfo getLeaderSocket(){
+		return leaderSocket;
 	}
 
 	public boolean isLeader(){
@@ -125,6 +131,14 @@ public class Peer {
 	public synchronized int getConsentNeeded(){
 		return consentNeeded;
 	}
+
+	public synchronized int getLeaderCount(){
+		return leaderCount;
+	}
+	public synchronized void setLeaderCount(int i){
+		leaderCount = i;
+	}
+
 	public synchronized boolean getDetectedMissingLeader(){
 		return detectedMissingLeader;
 	}
@@ -342,6 +356,7 @@ public class Peer {
 			BufferedReader reader = null; 
 			int counter = 0;
 			for (SocketInfo s : peers) {
+				//PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 				Socket socket = null;
 				try {
 					socket = new Socket(s.getHost(), s.getPort());
@@ -353,15 +368,23 @@ public class Peer {
 
 						if(s == leaderSocket && !detectedMissingLeader)
 						{
+							//PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+							//out.println(("{'type': 'detectedmissingleader', 'foundleader': 'true'"));
 							//do needed stuff to become leader
-							SocketInfo sn = new SocketInfo(hostInfo, Integer.valueOf(portInfo));
-							setLeader(true, sn);
+							//System.out.println("I first detected the missing leader. I will become the new leader.");
+							//SocketInfo sn = new SocketInfo(hostInfo, Integer.valueOf(portInfo));
+							//setLeader(true, sn);
 							//tell other peers who is the new leader
-							//setDetectedMissingLeader(true);
+							setDetectedMissingLeader(true);
+							System.out.println("Missing leader detected");
 							//push message containing socket and port info.
-							pushMessage("{'type': 'tellemwhosboss', 'username': '"+ username +"','ip':'" + hostInfo + "','port':'" + portInfo + "'}");
+							//pushMessage("{'type': 'tellemwhosboss', 'username': '"+ username +"','ip':'" + hostInfo + "','port':'" + portInfo + "'}");
 							//once message is received, they will execute a commLeader command with the sent info
 						}
+						//else if(s == leaderSocket)
+						//{
+						//	setDetectedMissingLeader(false);
+						//}
 						System.out.println("  Could not connect to " + s.getHost() + ":" + s.getPort());
 						System.out.println("  Removing that socketInfo from list");
 						toRemove.add(s);
@@ -369,9 +392,55 @@ public class Peer {
 					}
 					System.out.println("     Issue: " + c);
 				}
-
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-				out.println(message);
+				
+				if(detectedMissingLeader)
+				{
+					/*String stringtoinsert = ", 'foundleader': 'true'";
+					StringBuffer newString = new StringBuffer(message);
+					int index = message.length();
+					newString.insert(index - 2, stringtoinsert);
+					message = newString.toString();
+					System.out.println(message);*/
+					//SocketInfo sn = new SocketInfo("localhost", 9999);
+					//setLeader(true, sn);
+					if(message.equals(""))
+					{
+						message = "{'type': 'tellemwhosboss', 'username': '"+ username +"','ip':'" + hostInfo + "','port':'" + portInfo + "'}";
+						//System.out.println(message);
+					}
+					//System.out.println("Did detect missing leader");
+					//System.out.println(message);
+					//out.println(message);
+					//out.println(("{'type': 'detectedmissingleader', 'foundleader': 'true'"));
+					//out.println("{'type': 'tellemwhosboss', 'username': '"+ username +"','ip':'" + hostInfo + "','port':'" + portInfo + "'}");
+					//out.flush();
+					//out.close();
+					//out.flush();
+					//PrintWriter out2 = new PrintWriter(socket.getOutputStream(), true);
+					out.println(message);
+				}
+				else
+				{
+					//System.out.println("Did NOT detect missing leader");
+					//System.out.println(message);
+					/*String stringtoinsert = ", 'foundleader': 'true'";
+					StringBuffer newString = new StringBuffer(message);
+					int index = message.length();
+					newString.insert(index - 2, stringtoinsert);
+					message = newString.toString();
+					System.out.println(message);*/
+					//out.println(message);
+					//out.println(("{'type': 'detectedmissingleader', 'foundleader': 'false'"));
+					//out.flush();
+					//out.close();
+					//out.flush();
+					//PrintWriter out2 = new PrintWriter(socket.getOutputStream(), true);
+					out.println(message);
+				}
+				setDetectedMissingLeader(false);
+				//PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				//out.println(message);
 				//Test section to update peer joke lists
 				/*if(message.contains("{'type': 'joke',")){
 					JSONObject json = new JSONObject(reader.readLine());
@@ -388,6 +457,109 @@ public class Peer {
 		    for (SocketInfo s: toRemove){
 		    	peers.remove(s);
 		    }
+		    if(!message.equals(""))
+		    	System.out.println("     Message was sent to " + counter + " peers");
+
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public synchronized void leaderSetter(String message) {
+		try {
+			if(!message.equals(""))
+				System.out.println("     Trying to send to peers: " + peers.size());
+
+			Set<SocketInfo> toRemove = new HashSet<SocketInfo>();
+			BufferedReader reader = null; 
+			int counter = 0;
+			for (SocketInfo s : peers) {
+				//PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				Socket socket = null;
+				try {
+					socket = new Socket(s.getHost(), s.getPort());
+					reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				} catch (Exception c) {
+					if (socket != null) {
+						socket.close();
+					} else {
+						//else if(s == leaderSocket)
+						//{
+						//	setDetectedMissingLeader(false);
+						//}
+						System.out.println("  Could not connect to " + s.getHost() + ":" + s.getPort());
+						System.out.println("  Removing that socketInfo from list");
+						toRemove.add(s);
+						continue;
+					}
+					System.out.println("     Issue: " + c);
+				}
+				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				
+				//if(detectedMissingLeader)
+				//{
+					/*String stringtoinsert = ", 'foundleader': 'true'";
+					StringBuffer newString = new StringBuffer(message);
+					int index = message.length();
+					newString.insert(index - 2, stringtoinsert);
+					message = newString.toString();
+					System.out.println(message);*/
+					SocketInfo sn = new SocketInfo("localhost", 9999);
+					setLeader(true, sn);
+					//if(message.equals(""))
+					//{
+						message = "{'type': 'tellemwhosboss', 'username': '"+ username +"','ip':'" + hostInfo + "','port':'" + portInfo + "'}";
+						//System.out.println(message);
+					//}
+					//System.out.println("Did detect missing leader");
+					//System.out.println(message);
+					//out.println(message);
+					//out.println(("{'type': 'detectedmissingleader', 'foundleader': 'true'"));
+					//out.println("{'type': 'tellemwhosboss', 'username': '"+ username +"','ip':'" + hostInfo + "','port':'" + portInfo + "'}");
+					//out.flush();
+					//out.close();
+					//out.flush();
+					//PrintWriter out2 = new PrintWriter(socket.getOutputStream(), true);
+					out.println(message);
+				//}
+				//else
+				//{
+				//	System.out.println("Did NOT detect missing leader");
+				//	System.out.println(message);
+					/*String stringtoinsert = ", 'foundleader': 'true'";
+					StringBuffer newString = new StringBuffer(message);
+					int index = message.length();
+					newString.insert(index - 2, stringtoinsert);
+					message = newString.toString();
+					System.out.println(message);*/
+					//out.println(message);
+					//out.println(("{'type': 'detectedmissingleader', 'foundleader': 'false'"));
+					//out.flush();
+					//out.close();
+					//out.flush();
+					//PrintWriter out2 = new PrintWriter(socket.getOutputStream(), true);
+				//	out.println(message);
+				//}
+				//setDetectedMissingLeader(false);
+				//PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+				//out.println(message);
+				//Test section to update peer joke lists
+				/*if(message.contains("{'type': 'joke',")){
+					JSONObject json = new JSONObject(reader.readLine());
+					if(json.getString("type").equals("joke")){
+						System.out.println("     Received from server " + json);
+						String list = json.getString("list");
+						updateJokeList(list);
+					}
+				}*/
+
+				//counter++;
+				//socket.close();
+				detectedMissingLeader = false;
+		     }
+		    //for (SocketInfo s: toRemove){
+		    //	peers.remove(s);
+		    //}
 		    if(!message.equals(""))
 		    	System.out.println("     Message was sent to " + counter + " peers");
 
@@ -423,8 +595,10 @@ public class Peer {
 
         String[] hostPort = args[2].split(":");
         SocketInfo s = new SocketInfo(hostPort[0], Integer.valueOf(hostPort[1]));
-        String h = new String(hostPort[0]);
-        String p = new String(hostPort[1]);
+        String[] hostPort2 = args[1].split(":");
+        SocketInfo sn = new SocketInfo(hostPort2[0], Integer.valueOf(hostPort2[1]));
+        String h = new String(hostPort2[0]);
+        String p = new String(hostPort2[1]);
         hostInfo = h;
         portInfo = p;
         System.out.println(args[3]);

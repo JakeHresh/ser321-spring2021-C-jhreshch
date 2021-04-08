@@ -45,6 +45,11 @@ public class ServerTask extends Thread {
 			    	out.println(("{'type': 'join', 'list': '"+ peer.getPeers() +"', 'jokes': '" + peer.getFinalJokes() + "'}"));
 			    	//String finaljokes = peer.getFinalJokes();
 			    	//System.out.println(finaljokes);
+			    	SocketInfo sn = new SocketInfo(json.getString("ip"), json.getInt("port"));
+			    	if (peer.getLeaderSocket().getPort() != json.getInt("port") && !peer.getLeaderSocket().getHost().equals(json.getString("ip")))
+			    	{
+			    		peer.commLeader("{'type': 'join', 'username': '"+ json.getString("username") +"','ip':'" + json.getString("ip") + "','port':'" + json.getInt("port") + "'}");
+			    	}
 			    	if (peer.isLeader()){
 			    		peer.pushMessage(json.toString());
 			    	}
@@ -72,6 +77,9 @@ public class ServerTask extends Thread {
 			    	if(!peer.isLeader()){
 			    		peer.addJoke(json.getString("message"));
 			    	}
+			    } else if(json.getString("type").equals("detectedmissingleader")){
+			    	if(json.getString("foundleader").equals("true"))
+			    		peer.setDetectedMissingLeader(true);
 			    } else if(json.getString("type").equals("consent")){
 			    	if(peer.isLeader()){
 			    		peer.addConsent();
@@ -99,15 +107,23 @@ public class ServerTask extends Thread {
 			    	//System.out.println("     " + json); // just to show the json
 
 			    	//System.out.println("     " + json.getString("username") + " wants to join the network");
-			    	peer.updateListenToPeers(json.getString("ip") + ":" + json.getInt("port"));
+			    	//peer.updateListenToPeers(json.getString("ip") + ":" + json.getInt("port"));
 			    	//out.println(("{'type': 'join', 'list': '"+ peer.getPeers() +"'}"));
 			    	SocketInfo sn = new SocketInfo(json.getString("ip"), json.getInt("port"));
+			    	//System.out.println(json.getString("ip") + ":" + json.getInt("port"));
+			    	//System.out.println("hi");
+
+			    	peer.resetConsent();
+			    	peer.resetConsentNeeded();
+			    	peer.clearJokes();
+
 			    	peer.setLeader(true, sn);
 			    	peer.setDetectedMissingLeader(true);
-			    	//if (peer.isLeader()){
-			    	//	peer.pushMessage(json.toString());
+			    	if (peer.isLeader() && !peer.getInformed()){
+			    		peer.setInformed(true);
+			    		peer.leaderSetter(json.toString());
 			    		//peer.setDetectedMissingLeader(false);
-			    	//}
+			    	}
 			    } else if(json.getString("type").equals("consensusfail'")){
 			    	peer.resetConsent();
 			    	peer.resetConsentNeeded();
