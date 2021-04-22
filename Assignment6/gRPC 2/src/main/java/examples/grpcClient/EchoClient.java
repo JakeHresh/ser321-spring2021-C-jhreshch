@@ -10,6 +10,7 @@ import test.TestProtobuf;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 /**
  * Client that requests `parrot` method from the `EchoServer`.
@@ -19,7 +20,9 @@ public class EchoClient {
   private final JokeGrpc.JokeBlockingStub blockingStub2;
   private final RegistryGrpc.RegistryBlockingStub blockingStub3;
   //HAVE BLOCKING STUB FOR CALC SERVICE
+  private final CalcGrpc.CalcBlockingStub blockingStub4;
   //HAVE BLOCKING STUB FOR TIPS SERVICE
+  private final TipsGrpc.TipsBlockingStub blockingStub5;
 
   /** Construct client for accessing server using the existing channel. */
   public EchoClient(Channel channel, Channel regChannel) {
@@ -32,6 +35,8 @@ public class EchoClient {
     blockingStub = EchoGrpc.newBlockingStub(channel);
     blockingStub2 = JokeGrpc.newBlockingStub(channel);
     blockingStub3 = RegistryGrpc.newBlockingStub(regChannel);
+    blockingStub4 = CalcGrpc.newBlockingStub(channel);
+    blockingStub5 = TipsGrpc.newBlockingStub(channel);
   }
 
   public void askServerToParrot(String message) {
@@ -109,6 +114,54 @@ public class EchoClient {
       System.err.println("RPC failed: " + e);
       return;
     }
+  }
+  // Calc Wrapper Functions
+  public void requestAdd(ArrayList<Integer> nums) {
+    /*FindServersReq request = FindServersReq.newBuilder().setServiceName(name).build();
+    ServerListRes response;
+    try {
+      response = blockingStub3.findServers(request);
+      System.out.println(response.toString());
+    } catch (Exception e) {
+      System.err.println("RPC failed: " + e);
+      return;
+    }*/
+  }
+
+  public void requestSubtract(ArrayList<Integer> nums) {
+    /*FindServersReq request = FindServersReq.newBuilder().setServiceName(name).build();
+    ServerListRes response;
+    try {
+      response = blockingStub3.findServers(request);
+      System.out.println(response.toString());
+    } catch (Exception e) {
+      System.err.println("RPC failed: " + e);
+      return;
+    }*/
+  }
+
+  public void requestMultiply(ArrayList<Integer> nums) {
+    /*FindServersReq request = FindServersReq.newBuilder().setServiceName(name).build();
+    ServerListRes response;
+    try {
+      response = blockingStub3.findServers(request);
+      System.out.println(response.toString());
+    } catch (Exception e) {
+      System.err.println("RPC failed: " + e);
+      return;
+    }*/
+  }
+
+  public void requestDivide(ArrayList<Integer> nums) {
+    /*FindServersReq request = FindServersReq.newBuilder().setServiceName(name).build();
+    ServerListRes response;
+    try {
+      response = blockingStub3.findServers(request);
+      System.out.println(response.toString());
+    } catch (Exception e) {
+      System.err.println("RPC failed: " + e);
+      return;
+    }*/
   }
 
   public static void main(String[] args) throws Exception {
