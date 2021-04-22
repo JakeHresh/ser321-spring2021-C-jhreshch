@@ -4,7 +4,7 @@ import io.grpc.stub.StreamObserver;
 import service.*;
 
 // ###### THE INTERESTING PART #####
-// Implementing the Echo service
+// Implementing the Tips service
 class TipsImpl extends CalcGrpc.CalcImplBase {
     
     // We only defined one service so we only overwrite one method, we just echo back the client message

@@ -116,7 +116,23 @@ public class EchoClient {
     }
   }
   // Calc Wrapper Functions
-  public void requestAdd(ArrayList<Integer> nums) {
+  public void requestAdd(ArrayList<Double> nums) {
+    CalcRequest.Builder request = CalcRequest.newBuilder();
+    for (int i=0; i < nums.size(); i++){
+        request.addNum(nums.get(i));
+    }
+    CalcRequest req = request.build();
+    CalcResponse response;
+    try {
+      response = blockingStub4.add(req);
+      System.out.println(response.toString());
+    } catch (Exception e) {
+      System.err.println("RPC failed: " + e);
+      return;
+    }
+  }
+
+  public void requestSubtract(ArrayList<Double> nums) {
     /*FindServersReq request = FindServersReq.newBuilder().setServiceName(name).build();
     ServerListRes response;
     try {
@@ -128,7 +144,7 @@ public class EchoClient {
     }*/
   }
 
-  public void requestSubtract(ArrayList<Integer> nums) {
+  public void requestMultiply(ArrayList<Double> nums) {
     /*FindServersReq request = FindServersReq.newBuilder().setServiceName(name).build();
     ServerListRes response;
     try {
@@ -140,19 +156,7 @@ public class EchoClient {
     }*/
   }
 
-  public void requestMultiply(ArrayList<Integer> nums) {
-    /*FindServersReq request = FindServersReq.newBuilder().setServiceName(name).build();
-    ServerListRes response;
-    try {
-      response = blockingStub3.findServers(request);
-      System.out.println(response.toString());
-    } catch (Exception e) {
-      System.err.println("RPC failed: " + e);
-      return;
-    }*/
-  }
-
-  public void requestDivide(ArrayList<Integer> nums) {
+  public void requestDivide(ArrayList<Double> nums) {
     /*FindServersReq request = FindServersReq.newBuilder().setServiceName(name).build();
     ServerListRes response;
     try {
