@@ -24,6 +24,8 @@ public class EchoClient {
   private final CalcGrpc.CalcBlockingStub blockingStub4;
   //HAVE BLOCKING STUB FOR TIPS SERVICE
   private final TipsGrpc.TipsBlockingStub blockingStub5;
+  //HAVE BLOCKING STUB FOR PEOPLE SERVICE
+  private final PeopleGrpc.PeopleBlockingStub blockingStub6;
 
   /** Construct client for accessing server using the existing channel. */
   public EchoClient(Channel channel, Channel regChannel) {
@@ -38,6 +40,7 @@ public class EchoClient {
     blockingStub3 = RegistryGrpc.newBlockingStub(regChannel);
     blockingStub4 = CalcGrpc.newBlockingStub(channel);
     blockingStub5 = TipsGrpc.newBlockingStub(channel);
+    blockingStub6 = PeopleGrpc.newBlockingStub(channel);
   }
 
   public void askServerToParrot(String message) {
@@ -231,6 +234,54 @@ public class EchoClient {
     System.out.println("Success!");
   }
 
+  public void requestReadPeopleById(String id) {
+    PeopleReadByIdRequest.Builder request = PeopleReadByIdRequest.newBuilder();
+    request.setId(id);
+    PeopleReadByIdRequest req = request.build();
+    PeopleResponse response;
+    try {
+      response = blockingStub6.readbyid(req);//was req
+      System.out.println(response.toString());
+    } catch (Exception e) {
+      System.err.println("RPC failed: " + e);
+      return;
+    }
+    System.out.println("Your people: ");
+    /*for (String s : response.getNameList()) {
+      System.out.print(t.getName() + ": ");
+      System.out.println(t.getTip());
+    }*/
+    for(int i = 0; i < response.getNameCount(); i++)
+    {
+      System.out.println("Name: " + response.getName(i));
+      System.out.println("ID: " + response.getId(i));
+    }
+  }
+
+  public void requestReadPeopleByName(String id) {
+    PeopleReadByNameRequest.Builder request = PeopleReadByNameRequest.newBuilder();
+    request.setName(id);
+    PeopleReadByNameRequest req = request.build();
+    PeopleResponse response;
+    try {
+      response = blockingStub6.readbyname(req);//was req
+      System.out.println(response.toString());
+    } catch (Exception e) {
+      System.err.println("RPC failed: " + e);
+      return;
+    }
+    System.out.println("Your people: ");
+    /*for (String s : response.getNameList()) {
+      System.out.print(t.getName() + ": ");
+      System.out.println(t.getTip());
+    }*/
+    for(int i = 0; i < response.getNameCount(); i++)
+    {
+      System.out.println("Name: " + response.getName(i));
+      System.out.println("ID: " + response.getId(i));
+    }
+  }
+
   public static void main(String[] args) throws Exception {
     if (args.length != 6) {
       System.out
@@ -315,6 +366,10 @@ public class EchoClient {
 
       // showing 6 joked
       client.askForJokes(Integer.valueOf(6));*/
+
+      client.requestReadPeopleById("1");
+      client.requestReadPeopleByName("");
+
       if(!auto.equals("1"))
       {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -328,6 +383,8 @@ public class EchoClient {
         System.out.println("7. Divide numbers");
         System.out.println("8. Get tips");
         System.out.println("9. Add tip");
+        System.out.println("10. Request People By ID");
+        System.out.println("11. Request People By Name");
         System.out.println("0. Quit");
         String input = reader.readLine();
         while(!input.equals("0"))
@@ -341,6 +398,8 @@ public class EchoClient {
           System.out.println("7. Divide numbers");
           System.out.println("8. Get tips");
           System.out.println("9. Add tip");
+          System.out.println("10. Request People By ID");
+          System.out.println("11. Request People By Name");
           System.out.println("0. Quit");
           //input = reader.readLine();
           if(input.equals("1"))
@@ -478,6 +537,18 @@ public class EchoClient {
             String t = reader.readLine();
             client.requestWriteTips(n, t);
           }
+          else if(input.equals("10"))
+          {
+            System.out.println("Please enter an ID.");
+            String id = reader.readLine();
+            client.requestReadPeopleById(id);
+          }
+          else if(input.equals("11"))
+          {
+            System.out.println("Please enter a name.");
+            String n = reader.readLine();
+            client.requestReadPeopleByName(n);
+          }
           else if(!input.equals("0"))
           {
             System.out.println("Invalid input.");
@@ -509,6 +580,10 @@ public class EchoClient {
         client.requestWriteTips("Mary", "My tip to you is this...");
         System.out.println("Getting tips");
         client.requestReadTips();
+        System.out.println("Searching people by id 1");
+        client.requestReadPeopleById("1");
+        System.out.println("Searching people by name Mary");
+        client.requestReadPeopleByName("Mary");
       }
       System.out.println("Client Shutting Down...");
       // ############### Contacting the registry just so you see how it can be done

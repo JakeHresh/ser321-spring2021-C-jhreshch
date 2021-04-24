@@ -1,0 +1,29 @@
+//A simple person database where the two requests are to filter people by name and to filter people by id. Response returns different
+//data depending on inputs in requests. Each response returns a repeated list of people and id's.
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "service";
+option java_outer_classname = "StudentsProto";
+
+package services;
+//import "services/story.proto";
+
+service People {
+  rpc readbyname (PeopleReadByNameRequest) returns (PeopleResponse) {}
+  rpc readbyid (PeopleReadByIdRequest) returns (PeopleResponse) {}
+}
+
+message PeopleReadByNameRequest {
+  string name = 1;
+}
+
+message PeopleReadByIdRequest {
+  string id = 1;
+}
+
+message PeopleResponse {
+  repeated string name = 1;
+  repeated string id = 2;
+}

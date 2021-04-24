@@ -2,6 +2,8 @@ service/JokeSetRes.java
  service.JokeSetRes
  service.JokeSetRes$1
  service.JokeSetRes$Builder
+examples/grpcClient/PeopleImpl.java
+ example.grpcclient.PeopleImpl
 service/SortRequestOrBuilder.java
  service.SortRequestOrBuilder
 service/CalcResponseOrBuilder.java
@@ -32,6 +34,10 @@ service/SortResponse.java
  service.SortResponse$Builder
 service/ServerListResOrBuilder.java
  service.ServerListResOrBuilder
+service/PeopleReadByNameRequestOrBuilder.java
+ service.PeopleReadByNameRequestOrBuilder
+service/PeopleResponseOrBuilder.java
+ service.PeopleResponseOrBuilder
 service/TipOrBuilder.java
  service.TipOrBuilder
 service/SingleServerResOrBuilder.java
@@ -93,6 +99,19 @@ service/TipsWriteRequest.java
  service.TipsWriteRequest$Builder
 examples/grpcClient/RegistryAnswerImpl.java
  example.grpcclient.RegistryAnswerImpl
+service/PeopleGrpc.java
+ service.PeopleGrpc
+ service.PeopleGrpc$1
+ service.PeopleGrpc$2
+ service.PeopleGrpc$3
+ service.PeopleGrpc$MethodHandlers
+ service.PeopleGrpc$PeopleBaseDescriptorSupplier
+ service.PeopleGrpc$PeopleBlockingStub
+ service.PeopleGrpc$PeopleFileDescriptorSupplier
+ service.PeopleGrpc$PeopleFutureStub
+ service.PeopleGrpc$PeopleImplBase
+ service.PeopleGrpc$PeopleMethodDescriptorSupplier
+ service.PeopleGrpc$PeopleStub
 service/FindServersReqOrBuilder.java
  service.FindServersReqOrBuilder
 service/EchoGrpc.java
@@ -186,6 +205,10 @@ buffers/ResponseProtos.java
  buffers.ResponseProtos$Response$Services$Builder
  buffers.ResponseProtos$Response$ServicesOrBuilder
  buffers.ResponseProtos$ResponseOrBuilder
+service/PeopleReadByIdRequest.java
+ service.PeopleReadByIdRequest
+ service.PeopleReadByIdRequest$1
+ service.PeopleReadByIdRequest$Builder
 service/RegisterReqOrBuilder.java
  service.RegisterReqOrBuilder
 service/SortProto.java
@@ -200,6 +223,12 @@ examples/grpcClient/CalcImpl.java
  example.grpcclient.CalcImpl
 service/StoryProto.java
  service.StoryProto
+service/StudentsProto.java
+ service.StudentsProto
+service/PeopleReadByNameRequest.java
+ service.PeopleReadByNameRequest
+ service.PeopleReadByNameRequest$1
+ service.PeopleReadByNameRequest$Builder
 examples/TestProtobuf.java
  test.TestProtobuf
 service/ReadResponse.java
@@ -225,6 +254,10 @@ service/StoryGrpc.java
  service.StoryGrpc$StoryImplBase
  service.StoryGrpc$StoryMethodDescriptorSupplier
  service.StoryGrpc$StoryStub
+service/PeopleResponse.java
+ service.PeopleResponse
+ service.PeopleResponse$1
+ service.PeopleResponse$Builder
 service/JokeSetResOrBuilder.java
  service.JokeSetResOrBuilder
 service/TipsWriteResponseOrBuilder.java
@@ -261,6 +294,8 @@ buffers/RequestProtos.java
  buffers.RequestProtos$RequestOrBuilder
 service/ReadResponseOrBuilder.java
  service.ReadResponseOrBuilder
+service/PeopleReadByIdRequestOrBuilder.java
+ service.PeopleReadByIdRequestOrBuilder
 service/JokeRes.java
  service.JokeRes
  service.JokeRes$1
