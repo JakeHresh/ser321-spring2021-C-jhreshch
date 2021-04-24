@@ -11,6 +11,12 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 /**
  * Server that manages startup/shutdown of the `Node`.
  */
@@ -37,8 +43,8 @@ public class Node {
     server = ServerBuilder.forPort(port)
         .addService(new EchoImpl())
         .addService(new JokeImpl())
-        /*.addService(new CalcImpl())
-        .addService(new TipsImpl())*/
+        .addService(new CalcImpl())
+        .addService(new TipsImpl())
         .addService(new RegistryAnswerImpl(services)).build().start();
 
     for (var service : server.getServices()) {

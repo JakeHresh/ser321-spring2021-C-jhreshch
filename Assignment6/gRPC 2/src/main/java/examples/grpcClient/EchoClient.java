@@ -119,7 +119,7 @@ public class EchoClient {
   public void requestAdd(ArrayList<Double> nums) {
     CalcRequest.Builder request = CalcRequest.newBuilder();
     for (int i=0; i < nums.size(); i++){
-        request.addNum(nums.get(i));
+        request.addNum(nums.get(i).doubleValue());
     }
     CalcRequest req = request.build();
     CalcResponse response;
@@ -130,42 +130,82 @@ public class EchoClient {
       System.err.println("RPC failed: " + e);
       return;
     }
+    System.out.println("Result of adding: " + response.getSolution());
   }
 
   public void requestSubtract(ArrayList<Double> nums) {
-    /*FindServersReq request = FindServersReq.newBuilder().setServiceName(name).build();
-    ServerListRes response;
+    CalcRequest.Builder request = CalcRequest.newBuilder();
+    for (int i=0; i < nums.size(); i++){
+        request.addNum(nums.get(i).doubleValue());
+    }
+    CalcRequest req = request.build();
+    CalcResponse response;
     try {
-      response = blockingStub3.findServers(request);
+      response = blockingStub4.subtract(req);
       System.out.println(response.toString());
     } catch (Exception e) {
       System.err.println("RPC failed: " + e);
       return;
-    }*/
+    }
+    System.out.println("Result of subtracting: " + response.getSolution());
   }
 
   public void requestMultiply(ArrayList<Double> nums) {
-    /*FindServersReq request = FindServersReq.newBuilder().setServiceName(name).build();
-    ServerListRes response;
+    CalcRequest.Builder request = CalcRequest.newBuilder();
+    for (int i=0; i < nums.size(); i++){
+        request.addNum(nums.get(i).doubleValue());
+    }
+    CalcRequest req = request.build();
+    CalcResponse response;
     try {
-      response = blockingStub3.findServers(request);
+      response = blockingStub4.multiply(req);
       System.out.println(response.toString());
     } catch (Exception e) {
       System.err.println("RPC failed: " + e);
       return;
-    }*/
+    }
+    System.out.println("Result of multiplying: " + response.getSolution());
   }
 
   public void requestDivide(ArrayList<Double> nums) {
-    /*FindServersReq request = FindServersReq.newBuilder().setServiceName(name).build();
-    ServerListRes response;
+    CalcRequest.Builder request = CalcRequest.newBuilder();
+    for (int i=0; i < nums.size(); i++){
+        request.addNum(nums.get(i).doubleValue());
+    }
+    CalcRequest req = request.build();
+    CalcResponse response;
     try {
-      response = blockingStub3.findServers(request);
+      response = blockingStub4.divide(req);
       System.out.println(response.toString());
     } catch (Exception e) {
       System.err.println("RPC failed: " + e);
       return;
+    }
+    if(!response.getIsSuccess())
+      System.out.println("Denominator sum is 0. Cannot divide.");
+    else
+      System.out.println("Result of dividing: " + response.getSolution());
+  }
+
+  public void requestReadTips() {
+    Tip.Builder request = Tip.newBuilder();
+    /*for (int i=0; i < nums.size(); i++){
+        request.addNum(nums.get(i).doubleValue());
     }*/
+    //Tip req = request.build();
+    TipsReadResponse response;
+    try {
+      response = blockingStub5.read(null);//was req
+      System.out.println(response.toString());
+    } catch (Exception e) {
+      System.err.println("RPC failed: " + e);
+      return;
+    }
+    System.out.println("Your tips: ");
+    for (Tip t : response.getTipsList()) {
+      System.out.print(t.getName() + ": ");
+      System.out.println(t.getTip());
+    }
   }
 
   public static void main(String[] args) throws Exception {
@@ -255,19 +295,31 @@ public class EchoClient {
 
       // Comment these last Service calls while in Activity 1 Task 1, they are not needed and wil throw issues without the Registry running
       // get thread's services
-      client.getServices();
+      //client.getServices();
 
       // get parrot
-      client.findServer("services.Echo/parrot");
+      //client.findServer("services.Echo/parrot");
       
       // get all setJoke
-      client.findServers("services.Joke/setJoke");
+      //client.findServers("services.Joke/setJoke");
 
       // get getJoke
-      client.findServer("services.Joke/getJoke");
+      //client.findServer("services.Joke/getJoke");
+
+      ArrayList<Double> arr = new ArrayList<Double>();
+      arr.add(Double.valueOf(3.0));
+      arr.add(Double.valueOf(2.0));
+      arr.add(Double.valueOf(-2.0));
+      System.out.println("Requesting add");
+      client.requestAdd(arr);
+      client.requestSubtract(arr);
+      client.requestMultiply(arr);
+      client.requestDivide(arr);
+      client.requestReadTips();
+      //System.out.println(dub.doubleValue());
 
       // does not exist
-      client.findServer("random");
+      //client.findServer("random");
 
 
     } finally {
