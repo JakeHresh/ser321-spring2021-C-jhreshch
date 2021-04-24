@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 /**
  * Client that requests `parrot` method from the `EchoServer`.
@@ -314,8 +315,17 @@ public class EchoClient {
       client.askForJokes(Integer.valueOf(6));*/
       BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
       System.out.println("Hello! Please select a service.");
-
-      String input = "";
+      System.out.println("1. Ask server to parrot");
+      System.out.println("2. Ask for jokes");
+      System.out.println("3. Set joke");
+      System.out.println("4. Add numbers");
+      System.out.println("5. Subtract numbers");
+      System.out.println("6. Multiply numbers");
+      System.out.println("7. Divide numbers");
+      System.out.println("8. Get tips");
+      System.out.println("9. Add tip");
+      System.out.println("0. Quit");
+      String input = reader.readLine();
       while(!input.equals("0"))
       {
         System.out.println("1. Ask server to parrot");
@@ -328,47 +338,147 @@ public class EchoClient {
         System.out.println("8. Get tips");
         System.out.println("9. Add tip");
         System.out.println("0. Quit");
-        input = reader.readLine();
+        //input = reader.readLine();
         if(input.equals("1"))
         {
-
+          client.askServerToParrot(message);
         }
         else if(input.equals("2"))
         {
-
+          // Reading data using readLine
+          System.out.println("How many jokes would you like?"); // NO ERROR handling of wrong input here.
+          Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+          String num = reader.readLine();
+          while(!pattern.matcher(num).matches())
+          {
+            System.out.println("Invalid input. How many jokes would you like?");
+            num = reader.readLine();
+          }
+          // calling the joked service from the server with num from user input
+          client.askForJokes(Integer.valueOf(num));
         }
         else if(input.equals("3"))
         {
-
+          System.out.println("Enter your joke.");
+          client.setJoke(reader.readLine());
         }
         else if(input.equals("4"))
         {
-
+          System.out.println("Please enter numbers to add. When done, type anything.");
+          ArrayList<Double> arr = new ArrayList<Double>();
+          int count = 0;
+          Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+          String num = reader.readLine();
+          while(pattern.matcher(num).matches())
+          {
+            System.out.println("Place another number to include another number in the calculation.");
+            arr.add(Double.valueOf(num));
+            num = reader.readLine();
+            count++;
+          }
+          if(count == 0)
+          {
+            arr.add(Double.valueOf(0.0));
+            arr.add(Double.valueOf(0.0));
+          }
+          else if(count == 1)
+          {
+            arr.add(Double.valueOf(0.0));
+          }
+          client.requestAdd(arr);
         }
         else if(input.equals("5"))
         {
-
+          System.out.println("Please enter numbers to subtract. When done, type anything.");
+          ArrayList<Double> arr = new ArrayList<Double>();
+          int count = 0;
+          Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+          String num = reader.readLine();
+          while(pattern.matcher(num).matches())
+          {
+            System.out.println("Place another number to include another number in the calculation.");
+            arr.add(Double.valueOf(num));
+            num = reader.readLine();
+            count++;
+          }
+          if(count == 0)
+          {
+            arr.add(Double.valueOf(0.0));
+            arr.add(Double.valueOf(0.0));
+          }
+          else if(count == 1)
+          {
+            arr.add(Double.valueOf(0.0));
+          }
+          client.requestSubtract(arr);
         }
         else if(input.equals("6"))
         {
-
+          System.out.println("Please enter numbers to multiply. When done, type anything.");
+          ArrayList<Double> arr = new ArrayList<Double>();
+          int count = 0;
+          Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+          String num = reader.readLine();
+          while(pattern.matcher(num).matches())
+          {
+            System.out.println("Place another number to include another number in the calculation.");
+            arr.add(Double.valueOf(num));
+            num = reader.readLine();
+            count++;
+          }
+          if(count == 0)
+          {
+            arr.add(Double.valueOf(0.0));
+            arr.add(Double.valueOf(0.0));
+          }
+          else if(count == 1)
+          {
+            arr.add(Double.valueOf(0.0));
+          }
+          client.requestMultiply(arr);
         }
         else if(input.equals("7"))
         {
-
+          System.out.println("Please enter numbers to divide. When done, type anything.");
+          ArrayList<Double> arr = new ArrayList<Double>();
+          int count = 0;
+          Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+          String num = reader.readLine();
+          while(pattern.matcher(num).matches())
+          {
+            System.out.println("Place another number to include another number in the calculation.");
+            arr.add(Double.valueOf(num));
+            num = reader.readLine();
+            count++;
+          }
+          if(count == 0)
+          {
+            arr.add(Double.valueOf(0.0));
+            arr.add(Double.valueOf(0.0));
+          }
+          else if(count == 1)
+          {
+            arr.add(Double.valueOf(0.0));
+          }
+          client.requestDivide(arr);
         }
         else if(input.equals("8"))
         {
-
+          client.requestReadTips();
         }
         else if(input.equals("9"))
         {
-
+          System.out.println("Who is giving the tip?");
+          String n = reader.readLine();
+          System.out.println("What is the tip?");
+          String t = reader.readLine();
+          client.requestWriteTips(n, t);
         }
         else if(!input.equals("0"))
         {
-
+          System.out.println("Invalid input.");
         }
+        input = reader.readLine();
       }
       System.out.println("Client Shutting Down...");
       // ############### Contacting the registry just so you see how it can be done
