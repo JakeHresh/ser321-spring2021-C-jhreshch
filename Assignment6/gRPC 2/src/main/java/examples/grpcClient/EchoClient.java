@@ -208,6 +208,28 @@ public class EchoClient {
     }
   }
 
+  public synchronized void requestWriteTips(String name, String tip) {
+    TipsWriteRequest.Builder request = TipsWriteRequest.newBuilder();
+    Tip.Builder tipContainer = Tip.newBuilder();
+    tipContainer.setName(name);
+    tipContainer.setTip(tip);
+    /*for (int i=0; i < nums.size(); i++){
+        request.addNum(nums.get(i).doubleValue());
+    }*/
+    Tip t = tipContainer.build();
+    request.setTip(t);
+    TipsWriteRequest req = request.build();
+    TipsWriteResponse response;
+    try {
+      response = blockingStub5.write(req);//was req
+      System.out.println(response.toString());
+    } catch (Exception e) {
+      System.err.println("RPC failed: " + e);
+      return;
+    }
+    System.out.println("Success!");
+  }
+
   public static void main(String[] args) throws Exception {
     if (args.length != 5) {
       System.out
@@ -273,7 +295,7 @@ public class EchoClient {
       EchoClient client = new EchoClient(channel, regChannel);
 
       // call the parrot service on the server
-      client.askServerToParrot(message);
+      /*client.askServerToParrot(message);
 
       // ask the user for input how many jokes the user wants
       BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -289,8 +311,66 @@ public class EchoClient {
       client.setJoke("I made a pencil with two erasers. It was pointless.");
 
       // showing 6 joked
-      client.askForJokes(Integer.valueOf(6));
+      client.askForJokes(Integer.valueOf(6));*/
+      BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+      System.out.println("Hello! Please select a service.");
 
+      String input = "";
+      while(!input.equals("0"))
+      {
+        System.out.println("1. Ask server to parrot");
+        System.out.println("2. Ask for jokes");
+        System.out.println("3. Set joke");
+        System.out.println("4. Add numbers");
+        System.out.println("5. Subtract numbers");
+        System.out.println("6. Multiply numbers");
+        System.out.println("7. Divide numbers");
+        System.out.println("8. Get tips");
+        System.out.println("9. Add tip");
+        System.out.println("0. Quit");
+        input = reader.readLine();
+        if(input.equals("1"))
+        {
+
+        }
+        else if(input.equals("2"))
+        {
+
+        }
+        else if(input.equals("3"))
+        {
+
+        }
+        else if(input.equals("4"))
+        {
+
+        }
+        else if(input.equals("5"))
+        {
+
+        }
+        else if(input.equals("6"))
+        {
+
+        }
+        else if(input.equals("7"))
+        {
+
+        }
+        else if(input.equals("8"))
+        {
+
+        }
+        else if(input.equals("9"))
+        {
+
+        }
+        else if(!input.equals("0"))
+        {
+
+        }
+      }
+      System.out.println("Client Shutting Down...");
       // ############### Contacting the registry just so you see how it can be done
 
       // Comment these last Service calls while in Activity 1 Task 1, they are not needed and wil throw issues without the Registry running
@@ -306,7 +386,7 @@ public class EchoClient {
       // get getJoke
       //client.findServer("services.Joke/getJoke");
 
-      ArrayList<Double> arr = new ArrayList<Double>();
+      /*ArrayList<Double> arr = new ArrayList<Double>();
       arr.add(Double.valueOf(3.0));
       arr.add(Double.valueOf(2.0));
       arr.add(Double.valueOf(-2.0));
@@ -316,6 +396,8 @@ public class EchoClient {
       client.requestMultiply(arr);
       client.requestDivide(arr);
       client.requestReadTips();
+      client.requestWriteTips("Name3", "I have a new tip for you!");
+      client.requestReadTips();*/
       //System.out.println(dub.doubleValue());
 
       // does not exist

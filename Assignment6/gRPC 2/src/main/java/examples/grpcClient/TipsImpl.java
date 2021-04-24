@@ -71,15 +71,68 @@ class TipsImpl extends TipsGrpc.TipsImplBase {
         ServerResponse response = ServerResponse.newBuilder().setMessage(req.getMessage()).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();*/
-    }     /*
+    }     
     // We only defined one service so we only overwrite one method, we just echo back the client message
     @Override
-    public void subtract(ClientRequest req, StreamObserver<ServerResponse> responseObserver) {
-        System.out.println("Received from client: " + req.getMessage());
-        ServerResponse response = ServerResponse.newBuilder().setMessage(req.getMessage()).build();
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    } 
+    public void write(TipsWriteRequest req, StreamObserver<TipsWriteResponse> responseObserver) {
+        //reader = new BufferedReader(new FileReader(f));
+        try{
+            System.out.println("Attempting to write to file");
+            String filename = "TipsFile.json";
+            //System.out.println(new File(""));
+            InputStream is = TipsImpl.class.getResourceAsStream(filename);
+            /*if(is == null)
+                throw new Exception();*/
+            JSONTokener tokener = new JSONTokener(is);
+            JSONObject o = new JSONObject(tokener);
+            JSONArray tips = o.getJSONArray("Tips");
+            JSONArray names = o.getJSONArray("Names");
+            System.out.println(req.getTip().getName());
+            System.out.println(req.getTip().getTip());
+            names.put(req.getTip().getName());
+            tips.put(req.getTip().getTip());
+            o.put("Names", names);
+            o.put("Tips", tips);
+            String pathname = TipsImpl.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "example/grpcclient";
+            pathname = pathname.replaceAll("%20", " ");
+            System.out.println(pathname);
+            FileWriter file = new FileWriter(new File(pathname, filename));
+            /*file.write("{");
+            file.write("\"Names\":[");
+            for(int i = 0; i < tips.length(); i++)
+            {
+                if(i != tips.length() - 1)
+                    file.write("\"TestName\", ");
+                else
+                    file.write("\"TestName\"");
+            }
+            file.write("],\nTips:[");
+            for(int i = 0; i < tips.length(); i++)
+            {
+                if(i != tips.length() - 1)
+                    file.write("\"" + tips.getString(i) + "\", ");
+                else
+                    file.write("\"" + tips.getString(i) + "\"");
+            }
+            file.write("]");
+            file.write("}");*/
+            file.write(o.toString());
+            file.flush();
+            file.close();
+
+            TipsWriteResponse.Builder response = TipsWriteResponse.newBuilder();
+
+            response.setIsSuccess(true);
+            TipsWriteResponse resp = response.build();
+            responseObserver.onNext(resp);
+            responseObserver.onCompleted();
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+            System.out.println("Could not access file.");
+        } 
+    } /*
     // We only defined one service so we only overwrite one method, we just echo back the client message
     @Override
     public void multiply(ClientRequest req, StreamObserver<ServerResponse> responseObserver) {
