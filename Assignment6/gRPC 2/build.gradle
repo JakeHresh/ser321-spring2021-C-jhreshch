@@ -67,6 +67,7 @@ sourceSets {
 
  // Method to Echo in client
  def message = "Hello you" // for the echo service in the node
+ def auto = 0;
 
  
 
@@ -94,10 +95,13 @@ task arguments {
       discoveryPort = project.getProperty("discoveryPort")
     }
     if (project.hasProperty("message")) {
-      messase = project.getProperty("message")
+      message = project.getProperty("message")
     }
     if (project.hasProperty("serviceHost")) {
       serviceHost = project.getProperty("serviceHost")
+    }
+    if (project.hasProperty("auto")) {
+      auto = project.getProperty("auto")
     }
 }
 
@@ -152,6 +156,7 @@ task runClientJava(type: JavaExec) {
   args registryHost
   args grpcPort
   args message 
+  args auto
 }
 
 // runs a service node which already has the echo and joke service included
