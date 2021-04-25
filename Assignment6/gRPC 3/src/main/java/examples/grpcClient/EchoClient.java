@@ -84,16 +84,23 @@ public class EchoClient {
     }
   }
 
-  public void getServices() {
+  public ArrayList<String> getServices() {
+    ArrayList<String> arr = new ArrayList<String>();
     GetServicesReq request = GetServicesReq.newBuilder().build();
     ServicesListRes response;
     try {
       response = blockingStub3.getServices(request);
+      System.out.println("Figuring out what proto response is.");
       System.out.println(response.toString());
     } catch (Exception e) {
       System.err.println("RPC failed: " + e);
-      return;
+      return null;
     }
+    for(int i = 0; i < response.getServicesCount(); i++)
+    {
+      arr.add(response.getServices(i));
+    }
+    return arr;
   }
 
   public void findServer(String name) {
@@ -347,7 +354,7 @@ public class EchoClient {
       EchoClient client = new EchoClient(channel, regChannel);
 
       // call the parrot service on the server
-      client.askServerToParrot(message);
+      /*client.askServerToParrot(message);
 
       // ask the user for input how many jokes the user wants
       BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -363,16 +370,187 @@ public class EchoClient {
       client.setJoke("I made a pencil with two erasers. It was pointless.");
 
       // showing 6 joked
-      client.askForJokes(Integer.valueOf(6));
+      client.askForJokes(Integer.valueOf(6));*/
 
       // ############### Contacting the registry just so you see how it can be done
 
       // Comment these last Service calls while in Activity 1 Task 1, they are not needed and wil throw issues without the Registry running
       // get thread's services
-      client.getServices();
-
+      ArrayList<String> serviceArr = client.getServices();
+      System.out.println(serviceArr.get(0));
+      System.out.println("Out of these available services, please type the name of the service you would like. e.g. services.Echo/parrot. Type 0 to quit.");
+      BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String input = reader.readLine();
+        while(!input.equals("0"))
+        {
+          System.out.println("Out of these available services, please type the name of the service you would like. e.g. services.Echo/parrot. Type 0 to quit.");
+          //input = reader.readLine();
+          if(input.equals("services.Echo/parrot") && serviceArr.contains("services.Echo/parrot"))
+          {
+            client.findServer("services.Echo/parrot");
+            client.askServerToParrot(message);//needs to go through registry first
+          }
+          else if(input.equals("services.Joke/getJoke") && serviceArr.contains("services.Joke/getJoke"))
+          {
+            // Reading data using readLine
+            System.out.println("How many jokes would you like?"); // NO ERROR handling of wrong input here.
+            Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+            String num = reader.readLine();
+            while(!pattern.matcher(num).matches())
+            {
+              System.out.println("Invalid input. How many jokes would you like?");
+              num = reader.readLine();
+            }
+            client.findServer("services.Joke/getJoke");
+            // calling the joked service from the server with num from user input
+            client.askForJokes(Integer.valueOf(num));
+          }
+          else if(input.equals("services.Joke/setJoke") && serviceArr.contains("services.Joke/setJoke"))
+          {
+            client.findServer("services.Joke/setJoke");
+            System.out.println("Enter your joke.");
+            client.setJoke(reader.readLine());
+          }
+          else if(input.equals("services.Calc/add") && serviceArr.contains("services.Calc/add"))
+          {
+            System.out.println("Please enter numbers to add. When done, type anything.");
+            ArrayList<Double> arr = new ArrayList<Double>();
+            int count = 0;
+            Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+            String num = reader.readLine();
+            while(pattern.matcher(num).matches())
+            {
+              System.out.println("Place another number to include another number in the calculation.");
+              arr.add(Double.valueOf(num));
+              num = reader.readLine();
+              count++;
+            }
+            if(count == 0)
+            {
+              arr.add(Double.valueOf(0.0));
+              arr.add(Double.valueOf(0.0));
+            }
+            else if(count == 1)
+            {
+              arr.add(Double.valueOf(0.0));
+            }
+            client.findServer("services.Calc/add");
+            client.requestAdd(arr);
+          }
+          else if(input.equals("services.Calc/subtract") && serviceArr.contains("services.Calc/subtract"))
+          {
+            System.out.println("Please enter numbers to subtract. When done, type anything.");
+            ArrayList<Double> arr = new ArrayList<Double>();
+            int count = 0;
+            Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+            String num = reader.readLine();
+            while(pattern.matcher(num).matches())
+            {
+              System.out.println("Place another number to include another number in the calculation.");
+              arr.add(Double.valueOf(num));
+              num = reader.readLine();
+              count++;
+            }
+            if(count == 0)
+            {
+              arr.add(Double.valueOf(0.0));
+              arr.add(Double.valueOf(0.0));
+            }
+            else if(count == 1)
+            {
+              arr.add(Double.valueOf(0.0));
+            }
+            client.findServer("services.Calc/subtract");
+            client.requestSubtract(arr);
+          }
+          else if(input.equals("services.Calc/multiply") && serviceArr.contains("services.Calc/multiply"))
+          {
+            System.out.println("Please enter numbers to multiply. When done, type anything.");
+            ArrayList<Double> arr = new ArrayList<Double>();
+            int count = 0;
+            Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+            String num = reader.readLine();
+            while(pattern.matcher(num).matches())
+            {
+              System.out.println("Place another number to include another number in the calculation.");
+              arr.add(Double.valueOf(num));
+              num = reader.readLine();
+              count++;
+            }
+            if(count == 0)
+            {
+              arr.add(Double.valueOf(0.0));
+              arr.add(Double.valueOf(0.0));
+            }
+            else if(count == 1)
+            {
+              arr.add(Double.valueOf(0.0));
+            }
+            client.findServer("services.Calc/multiply");
+            client.requestMultiply(arr);
+          }
+          else if(input.equals("services.Calc/divide") && serviceArr.contains("services.Calc/divide"))
+          {
+            System.out.println("Please enter numbers to divide. When done, type anything.");
+            ArrayList<Double> arr = new ArrayList<Double>();
+            int count = 0;
+            Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+            String num = reader.readLine();
+            while(pattern.matcher(num).matches())
+            {
+              System.out.println("Place another number to include another number in the calculation.");
+              arr.add(Double.valueOf(num));
+              num = reader.readLine();
+              count++;
+            }
+            if(count == 0)
+            {
+              arr.add(Double.valueOf(0.0));
+              arr.add(Double.valueOf(0.0));
+            }
+            else if(count == 1)
+            {
+              arr.add(Double.valueOf(0.0));
+            }
+            client.findServer("services.Calc/divide");
+            client.requestDivide(arr);
+          }
+          else if(input.equals("services.Tips/read") && serviceArr.contains("services.Tips/read"))
+          {
+            client.findServer("services.Tips/read");
+            client.requestReadTips();
+          }
+          else if(input.equals("services.Tips/write") && serviceArr.contains("services.Tips/write"))
+          {
+            System.out.println("Who is giving the tip?");
+            String n = reader.readLine();
+            System.out.println("What is the tip?");
+            String t = reader.readLine();
+            client.findServer("services.Tips/write");
+            client.requestWriteTips(n, t);
+          }
+          else if(input.equals("services.People/readbyid") && serviceArr.contains("services.People/readbyid"))
+          {
+            System.out.println("Please enter an ID.");
+            String id = reader.readLine();
+            client.findServer("services.People/readbyid");
+            client.requestReadPeopleById(id);
+          }
+          else if(input.equals("services.People/readbyname") && serviceArr.contains("services.People/readbyname"))
+          {
+            System.out.println("Please enter a name.");
+            String n = reader.readLine();
+            client.findServer("services.People/readbyname");
+            client.requestReadPeopleByName(n);
+          }
+          else if(!input.equals("0"))
+          {
+            System.out.println("Invalid input.");
+          }
+          input = reader.readLine();
+        }
       // get parrot
-      client.findServer("services.Echo/parrot");
+      /*client.findServer("services.Echo/parrot");
       
       // get all setJoke
       client.findServers("services.Joke/setJoke");
@@ -381,7 +559,7 @@ public class EchoClient {
       client.findServer("services.Joke/getJoke");
 
       // does not exist
-      client.findServer("random");
+      client.findServer("random");*/
 
 
     } finally {
